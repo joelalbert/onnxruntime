@@ -36,8 +36,18 @@ jobs:
           call "%VSROOT%\VC\Auxiliary\Build\vcvars64.bat"
           call .\build.bat --config Release --build_wheel --parallel %NUMBER_OF_PROCESSORS% --skip_tests --compile_no_warning_as_error --cmake_generator Ninja
 
+      - name: Collect wheel
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force wheelhouse | Out-Null
+          Get-ChildItem build/Windows -Recurse -Depth 4 -Filter *.whl -ErrorAction SilentlyContinue |
+            Copy-Item -Destination wheelhouse
+          $found = Get-ChildItem wheelhouse -Filter *.whl
+          if (-not $found) { throw "No wheel found under build/Windows" }
+          $found | ForEach-Object { Write-Host $_.Name }
+
       - uses: actions/upload-artifact@v4
         with:
           name: onnxruntime-wheel-${{ inputs.python_version }}
-          path: build/Windows/**/dist/*.whl
+          path: wheelhouse/*.whl
           if-no-files-found: error
