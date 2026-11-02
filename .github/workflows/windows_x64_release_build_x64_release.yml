@@ -46,7 +46,6 @@ jobs:
             --build_dir "${{ github.workspace }}\build" `
             --skip_submodule_sync `
             --parallel `
-            --use_binskim_compliant_compile_flags `
             --cmake_generator "Visual Studio 17 2022" `
             --build_wheel
           if ($LASTEXITCODE -ne 0) {
